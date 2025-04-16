@@ -1,0 +1,211 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+    networks:
+      - mynetwork
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - mynetwork
+
+
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    image: eureka-server:latest
+    ports:
+      - "8761:8761"       #not commented just to check on microservices
+    networks:
+      - mynetwork
+
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    image: api-gateway
+    ports:
+      - "8765:8765"
+    depends_on:
+      - eureka-server
+    networks:
+      - mynetwork
+    environment:
+      - SECRET_KEY=${JWT_SECRET}
+
+
+
+
+  recommendation-service-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${USERNAME}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: recommendation_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - recommendation_service_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+
+  recommendation-service:
+    image: recommendation-service
+    build:
+      context: ./recommendation-service
+      dockerfile: Dockerfile
+    depends_on:
+      - recommendation-service-db
+      - eureka-server
+    environment:
+      - SPRING_DATASOURCE_USERNAME=${USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://recommendation-service-db:5432/recommendation_db
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SPRING_JPA_SHOW-SQL=true
+      - KAFKA_BROKER=localhost:9092
+      - SECRET_KEY=${JWT_SECRET}
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+    networks:
+      - mynetwork
+    ports: []
+#      - "8083:8083"
+
+
+
+
+  review-service-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${USERNAME}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: review_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - review_service_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+
+  review-service:
+    image: review-service
+    build:
+      context: ./review-service
+      dockerfile: Dockerfile
+    depends_on:
+      - review-service-db
+      - eureka-server
+    ports: []
+#      - 8082:8082
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://review-service-db:5432/review_db
+      - SPRING_DATASOURCE_USERNAME=${USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SPRING_JPA_SHOW-SQL=true
+      - SECRET_KEY=${JWT_SECRET}
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+    networks:
+      - mynetwork
+
+
+
+  auth-service-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${USERNAME}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_service_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  auth-service:
+    image: auth-service
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    depends_on:
+      - auth-service-db
+      - eureka-server
+
+    ports: []
+#      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-service-db:5432/auth_db
+      - SPRING_DATASOURCE_USERNAME=${USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SPRING_JPA_SHOW-SQL=true
+      - SECRET_KEY=${JWT_SECRET}
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+    networks:
+      - mynetwork
+
+  book-service-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${USERNAME}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: book_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - book_service_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  book-service:
+    image: book-service
+    build:
+      context: ./book-service
+      dockerfile: Dockerfile
+    depends_on:
+      - book-service-db
+      - eureka-server
+    ports: []
+#      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://book-service-db:5432/book_db
+      - SPRING_DATASOURCE_USERNAME=${USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${PASSWORD}
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SPRING_JPA_SHOW-SQL=true
+      - eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+    networks:
+      - mynetwork
+
+volumes:
+  auth_service_data:
+  book_service_data:
+  review_service_data:
+  recommendation_service_data:
+
+networks:
+  mynetwork:
+    driver: bridge
