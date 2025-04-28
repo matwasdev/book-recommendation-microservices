@@ -20,5 +20,4 @@ public class AuthorUpdateRequest {
 
     @Size(max = 40)
     private String surname;
-
 }

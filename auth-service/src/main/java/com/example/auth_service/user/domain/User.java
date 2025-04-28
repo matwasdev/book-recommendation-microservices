@@ -19,7 +19,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true,nullable = false, length = 30)
+    @Column(unique = true, nullable = false, length = 30)
     private String username;
 
     @Column(nullable = false, length = 100)
@@ -33,10 +33,8 @@ public class User {
     private LocalDateTime createdAt;
 
 
-
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
-
 }

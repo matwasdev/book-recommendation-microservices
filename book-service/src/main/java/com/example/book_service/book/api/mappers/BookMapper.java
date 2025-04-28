@@ -1,7 +1,6 @@
 package com.example.book_service.book.api.mappers;
 
 
-
 import com.example.book_service.book.api.dto.book.BookDto;
 import com.example.book_service.book.domain.Book;
 import org.mapstruct.Mapper;
@@ -18,6 +17,6 @@ public interface BookMapper {
 
     @Mapping(source = "authorId", target = "author.id")
     List<BookDto> toDto(List<Book> books);
-    Book toEntity(BookDto booksDto);
 
+    Book toEntity(BookDto booksDto);
 }

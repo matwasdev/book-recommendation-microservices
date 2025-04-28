@@ -37,5 +37,4 @@ public class Recommendation {
     protected void onCreate() {
         recommendedAt = ZonedDateTime.now();
     }
-
 }

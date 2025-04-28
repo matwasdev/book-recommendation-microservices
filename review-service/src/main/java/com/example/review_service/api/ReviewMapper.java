@@ -11,7 +11,8 @@ import java.util.List;
 public interface ReviewMapper {
 
     ReviewDto toDto(Review review);
-    List<ReviewDto> toDto(List<Review> reviews);
-    Review toEntity(ReviewDto reviewDto);
 
+    List<ReviewDto> toDto(List<Review> reviews);
+
+    Review toEntity(ReviewDto reviewDto);
 }

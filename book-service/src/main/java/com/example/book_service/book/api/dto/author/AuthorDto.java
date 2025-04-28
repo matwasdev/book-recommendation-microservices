@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorDto {
-
     String name;
-    String surname;
 
+    String surname;
 }

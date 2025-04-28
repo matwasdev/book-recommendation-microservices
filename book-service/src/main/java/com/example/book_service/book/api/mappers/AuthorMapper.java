@@ -11,7 +11,8 @@ import java.util.List;
 public interface AuthorMapper {
 
     AuthorDto toDto(Author author);
-    List<AuthorDto> toDto(List<Author> authors);
-    Author toEntity(AuthorDto authorDto);
 
+    List<AuthorDto> toDto(List<Author> authors);
+
+    Author toEntity(AuthorDto authorDto);
 }

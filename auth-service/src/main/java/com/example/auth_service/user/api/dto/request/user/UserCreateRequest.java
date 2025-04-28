@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 public class UserCreateRequest {
 
     @NotBlank
-    @Size(max=30)
+    @Size(max = 30)
     private String username;
+
 
     @NotBlank
     @Size(max = 100)
     private String password;
-
 }

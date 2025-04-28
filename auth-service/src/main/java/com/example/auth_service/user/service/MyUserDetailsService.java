@@ -4,6 +4,7 @@ import com.example.auth_service.user.domain.User;
 import com.example.auth_service.user.infrastructure.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,24 +13,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow( () -> new EntityNotFoundException("Username: "+ username +" not found"));
+        log.info("Attempting to load user with username: {}", username);
 
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .roles(new String[]{user.getRole().getName()})
-                .build();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            log.warn("User with username {} not found in database", username);
+            return new EntityNotFoundException("Username: " + username + " not found");
+        });
+
+        log.debug("Successfully loaded user: {}", username);
+
+        return org.springframework.security.core.userdetails.User.builder().username(user.getUsername()).password(user.getPassword()).roles(new String[]{user.getRole().getName()}).build();
     }
-
-
-
-
-
 }

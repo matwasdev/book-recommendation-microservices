@@ -24,16 +24,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/login", "/api/user/create").permitAll();
-                    registry.requestMatchers("/auth/**").permitAll();
-                    registry.requestMatchers("/api/user/**").permitAll()
-                            .anyRequest().permitAll();
-                })
-                .httpBasic(Customizer.withDefaults())
-                .build();
+        return httpSecurity.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(registry -> {
+            registry.requestMatchers("/login", "/api/user/create").permitAll();
+            registry.requestMatchers("/auth/**").permitAll();
+            registry.requestMatchers("/api/user/**").permitAll().anyRequest().permitAll();
+        }).httpBasic(Customizer.withDefaults()).build();
     }
 
 
@@ -51,12 +46,8 @@ public class SecurityConfig {
     }
 
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-
 }

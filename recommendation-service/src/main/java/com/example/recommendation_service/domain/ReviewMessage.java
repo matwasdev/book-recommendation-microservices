@@ -19,5 +19,4 @@ public class ReviewMessage {
 
     @JsonProperty("rating")
     private int rating;
-
 }

@@ -12,8 +12,9 @@ import java.util.List;
 public interface RecommendationMapper {
 
     RecommendationDto toDto(Recommendation recommendation);
-    List<RecommendationDto> toDto(List<Recommendation> recommendations);
-    Recommendation toEntity(RecommendationDto recommendationDto);
 
+    List<RecommendationDto> toDto(List<Recommendation> recommendations);
+
+    Recommendation toEntity(RecommendationDto recommendationDto);
 }
 

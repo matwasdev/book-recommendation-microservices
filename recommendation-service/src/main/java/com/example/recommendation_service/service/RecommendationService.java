@@ -8,6 +8,7 @@ import com.example.recommendation_service.infrastructure.RecommendationRepositor
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationService {
 
     private final RecommendationRepository recommendationRepository;
@@ -31,26 +33,25 @@ public class RecommendationService {
         return recommendationMapper.toDto(recommendation);
     }
 
-    public List<RecommendationDto> getAllRecommendations(){
+    public List<RecommendationDto> getAllRecommendations() {
         List<Recommendation> recommendations = recommendationRepository.findAll();
         return recommendationMapper.toDto(recommendations);
     }
 
-    public RecommendationDto getRecommendationById(Long id){
-        Recommendation recommendation = recommendationRepository.findById(id)
-                .orElseThrow( () -> new EntityNotFoundException("Recommendation not found"));
+    public RecommendationDto getRecommendationById(Long id) {
+        Recommendation recommendation = recommendationRepository.findById(id).orElseThrow(() -> {
+            log.warn("Could not find recommendation with id {}", id);
+            return new EntityNotFoundException("Recommendation not found");
+        });
         return recommendationMapper.toDto(recommendation);
     }
 
-    public RecommendationDto getLatestRecommendation(){
+    public RecommendationDto getLatestRecommendation() {
         Recommendation recommendation = recommendationRepository.findTopByOrderByRecommendedAtDesc();
-        if(recommendation == null){
+        if (recommendation == null) {
+            log.warn("Could not find latest recommendation");
             throw new EntityNotFoundException("Recommendation not found");
         }
         return recommendationMapper.toDto(recommendation);
     }
-
-
-
-
 }

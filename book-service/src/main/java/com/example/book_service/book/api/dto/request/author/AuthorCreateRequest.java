@@ -18,5 +18,4 @@ public class AuthorCreateRequest {
     @NotBlank
     @Size(max = 40)
     private String surname;
-
 }

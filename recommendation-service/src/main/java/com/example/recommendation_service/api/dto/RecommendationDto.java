@@ -21,7 +21,4 @@ public class RecommendationDto {
     private Integer rating;
 
     private ZonedDateTime recommendedAt;
-
-
-
 }

@@ -18,5 +18,4 @@ public class BookCreateRequest {
 
     @NotNull
     private Long authorId;
-
 }

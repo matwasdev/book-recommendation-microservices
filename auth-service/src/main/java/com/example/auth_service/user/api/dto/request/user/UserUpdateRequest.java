@@ -17,10 +17,9 @@ public class UserUpdateRequest {
     private Long userId;
 
     @NotBlank
-    @Size(max=30)
+    @Size(max = 30)
     private String username;
 
     @Size(max = 100)
     private String password;
-
 }

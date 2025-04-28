@@ -11,6 +11,4 @@ import lombok.NoArgsConstructor;
 public class UserDto {
 
     private String username;
-
-
 }

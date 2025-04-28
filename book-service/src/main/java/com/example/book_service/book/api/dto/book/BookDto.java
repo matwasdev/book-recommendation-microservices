@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookDto {
     String title;
-    Long authorId;
 
+    Long authorId;
 }

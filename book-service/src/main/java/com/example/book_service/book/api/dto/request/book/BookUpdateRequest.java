@@ -19,5 +19,4 @@ public class BookUpdateRequest {
     private String title;
 
     private Long authorId;
-
 }
